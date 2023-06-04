@@ -11,12 +11,16 @@ impl FromStr for Time {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        let mut t = s;
+        let mut t = s.trim();
         let (mut hour, mut minute, mut seconds): (&str, &str, &str);
 
         (hour, t) = t.split_once('h').unwrap_or(("", t));
         (minute, t) = t.split_once('m').unwrap_or(("", t));
-        seconds = if t.ends_with('s') { &t[..1] } else { t };
+        seconds = if t.ends_with('s') {
+            &t[..t.len() - 1]
+        } else {
+            t
+        };
 
         let hour = if hour.is_empty() {
             0
@@ -107,6 +111,15 @@ mod tests {
         assert_eq!(Time::from_str("2s")?.0, 2);
         assert_eq!(Time::from_str("2")?.0, 2);
         assert_eq!(Time::from_str("0")?.0, 0);
+        Ok(())
+    }
+
+    #[test]
+    fn trailing() -> Result<()> {
+        assert_eq!(Time::from_str("20h")?.0, (60 * 60) * 20);
+        assert_eq!(Time::from_str("20m")?.0, 20 * 60);
+        assert_eq!(Time::from_str("20s")?.0, 20);
+        assert_eq!(Time::from_str("20")?.0, 20);
         Ok(())
     }
 }
