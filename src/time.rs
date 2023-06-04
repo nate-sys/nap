@@ -16,21 +16,21 @@ impl FromStr for Time {
 
         (hour, t) = t.split_once('h').unwrap_or(("", t));
         (minute, t) = t.split_once('m').unwrap_or(("", t));
-        seconds = if t.ends_with("s") { &t[..1] } else { t };
+        seconds = if t.ends_with('s') { &t[..1] } else { t };
 
-        let hour = if hour.len() == 0 {
+        let hour = if hour.is_empty() {
             0
         } else {
             hour.parse::<u32>()?
         };
 
-        let minute = if minute.len() == 0 {
+        let minute = if minute.is_empty() {
             0
         } else {
             minute.parse::<u32>()?
         };
 
-        let seconds = if seconds.len() == 0 {
+        let seconds = if seconds.is_empty() {
             0
         } else {
             seconds.parse::<u32>()?

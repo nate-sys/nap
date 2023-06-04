@@ -4,6 +4,8 @@ use std::{thread, time::Duration};
 use anyhow::Result;
 use clap::Parser;
 
+use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
+
 mod time;
 
 #[derive(Parser)]
@@ -16,10 +18,17 @@ struct Cli {
 fn main() -> Result<()> {
     let args = Cli::parse();
 
-    for second in 0..args.time.0 {
-        println!("{}", args.time.0 - second);
+    let style =
+        ProgressStyle::with_template("{elapsed_precise:^} {wide_bar:.blue/black} {msg:^12}")?
+            .progress_chars("━━━");
+    let bar = ProgressBar::new(args.time.0 as u64).with_style(style);
+    bar.set_message(HumanDuration(Duration::from_secs(args.time.0 as u64)).to_string());
+
+    for secs in 0..args.time.0 {
         thread::sleep(Duration::from_secs(1));
+        bar.inc(1);
     }
+    bar.finish_with_message("Time's up!");
 
     Ok(())
 }
