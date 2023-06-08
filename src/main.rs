@@ -21,14 +21,21 @@ struct Cli {
     /// 3rd char = time left
     #[arg(short, long, default_value_t=Default::default())]
     progress: Progress,
+
+    /// Colors of the progress bar separated by a '/'
+    /// eg: "green/black", "blue/yellow.on_blue"
+    #[arg(short, long, default_value_t=String::from("blue/black"))]
+    color: String,
 }
 
 fn main() -> Result<()> {
     let args = Cli::parse();
 
-    let style =
-        ProgressStyle::with_template("{elapsed_precise:^} {wide_bar:.blue/black} {msg:^12}")?
-            .progress_chars(&args.progress.to_string());
+    let style = ProgressStyle::with_template(&format!(
+        "{{elapsed_precise:^}} {{wide_bar:.{}}} {{msg:^12}}",
+        args.color
+    ))?
+    .progress_chars(&args.progress.to_string());
     let bar = ProgressBar::new(args.time.0 as u64).with_style(style);
     bar.set_message(HumanDuration(Duration::from_secs(args.time.0 as u64)).to_string());
 
