@@ -16,8 +16,8 @@ impl FromStr for Time {
 
         (hour, t) = t.split_once('h').unwrap_or(("", t));
         (minute, t) = t.split_once('m').unwrap_or(("", t));
-        seconds = if t.ends_with('s') {
-            &t[..t.len() - 1]
+        seconds = if let Some(stripped) = t.strip_suffix('s') {
+            stripped
         } else {
             t
         };
